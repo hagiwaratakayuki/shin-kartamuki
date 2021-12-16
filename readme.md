@@ -9,7 +9,7 @@
 傾斜の抽出部分はpythonでnumpyにのみ依存しています。インストールされていない場合は
 
 ```
-pip install -r 
+pip install -r requirements.txt
 ```
 
 次にwebサーバーを起動します
