@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 from .lib import get_slope
 
-def parse(file:str, output:str,  step:int=20):
+def parse(file:str, output:str,  step:int=4):
 
   
     
@@ -87,10 +87,10 @@ def parse(file:str, output:str,  step:int=20):
     slope = get_slope(alts_np)
     slope_list = []
     
-    #step_v = slope.shape[0] / step
-    #step_h = slope.shape[1] / step
-    for slope_v, grid_coord_v in zip(np.array_split(slope, step, 0), np.array_split(grid_coord_np, step, 0)):
-        for slope_vh, grid_coord_vh in zip(np.array_split(slope_v, step, 1), np.array_split(grid_coord_v, step, 1)):
+    step_v = slope.shape[0] / step
+    step_h = slope.shape[1] / step
+    for slope_v, grid_coord_v in zip(np.array_split(slope, step_v, 0), np.array_split(grid_coord_np, step_v, 0)):
+        for slope_vh, grid_coord_vh in zip(np.array_split(slope_v, step_h, 1), np.array_split(grid_coord_v, step_h, 1)):
             slope_avg = np.average(slope_vh)
             grid_coord_avg = np.average(grid_coord_vh)
             slope_dict = {
