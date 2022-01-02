@@ -3,18 +3,25 @@ import re
 import json
 import numpy as np
 import xml.etree.ElementTree as ET
-
+import os
 from .lib import get_slope
 
-def parse(file:str, output:str,  step:int=4):
+def parse(file:str,step:int=10):
+    return _execparse(file, step)
 
-  
-    
+def parse_dir(dir:str, step:int=10):
+    grids = []
+    slopes = []
+    paths = os.listdir(dir) 
+    for path in paths:
+        res = _execparse(os.path.join(dir, path), step)
+        grids.append(res['grid'])
+        slopes += res['slopes']
+    return dict(grids=grids, slopes=slopes) 
+
+
+def _execparse(file:str, step:int):   
     demtree = ET.parse(file) 
-    
-
-
-
     demroot = demtree.getroot()
 
     
@@ -119,10 +126,12 @@ def parse(file:str, output:str,  step:int=4):
         'grid':grid,
         'slopes':slope_list,
 
+    
     }
 
-    with open(output,mode='w') as fp:
-        json.dump(data, fp)
+    return data
+
+    
     
             
 
