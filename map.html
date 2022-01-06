@@ -33,6 +33,16 @@
   font-size: 20px;
   color:blue;
 }
+#hide_dom{
+    display: none;
+}
+#hazerd_controll{
+   background-color: white;
+   border-radius: 5px;
+}
+#hazerd_controll label{
+    display: block;
+}
     </style>
 
 
@@ -44,12 +54,28 @@
 
 
     <div id="map" style="width:100%; height: 400px;"></div>
+    <div id="hide_dom">
+        <div id="hazerd_controll">
+            <form name="layer_selector">
+                <div class='controll_unit'>
+                   <label><input type="radio" name="htype" value="depth" checked>国土地理院：洪水浸水想定区域（想定最大規模）</label>
+                   <label><input type="radio" name="htype" value="time">国土地理院：浸水継続時間（想定最大規模)</label>
+                </div>
+              
+
+            
+
+            </form>
+        </div>
+
+    </div>
     <script>
 
        var map = L.map('map', {
-            center: [35.66018818015924, 139.7060675777756],
-            zoom: 17,
+            center: [35.6581,139.7017],
+            zoom: 16,
         }); 
+        var radios;
 
       var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
@@ -57,7 +83,67 @@
         });
         tileLayer.addTo(map);
         tileLayer.on('load', loadJson)
+        var controllCls = L.Control.extend({
+                onAdd: function (map) {
+                    this._div = L.DomUtil.create('div', 'custom-panel leaflet-bar');
+                    radios = document.forms.layer_selector.htype;
+                    for (let i = 0; i < radios.length; i++) {
+                        const radio = radios[i];
+                        radio.addEventListener('change', changeHtype)
+                        
+                    }
+                    this._div.appendChild(document.getElementById('hazerd_controll'))
+                    return this._div;
+                },
 
+                onRemove: function (map) {
+                },
+
+               
+
+               
+        });
+
+      
+        var overlay = {};
+        overlay['depth'] = L.tileLayer('https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png', {
+            maxNativeZoom: 17,
+            attribution: '国土地理院：洪水浸水想定区域（想定最大規模）'
+        });
+        overlay['time'] = L.tileLayer('https://disaportaldata.gsi.go.jp/raster/01_flood_l2_keizoku_data/{z}/{x}/{y}.png', {
+             maxNativeZoom: 17,
+            attribution: '国土地理院：浸水継続時間（想定最大規模）'
+        });
+        
+        overlay['debris_flow'] = L.tileLayer('https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/{z}/{x}/{y}.png', {
+                maxNativeZoom: 17,
+                attribution: '国土地理院：土砂災害警戒区域（土石流）'
+        }); 
+        for (const key in overlay) {
+            overlay[key].addTo(map)
+        }
+
+
+        var controll = new controllCls()
+        controll.addTo(map)
+        changeHtype()
+
+
+
+
+    
+        function changeHtype(){
+            var selected = radios.value;
+            for (const key in overlay) {
+               var layer = overlay[key]
+               if(selected === key){
+                   layer.setOpacity(1.0)
+               }
+               else{
+                   layer.setOpacity(0.0)
+               }
+            }
+        }
         function reqListener() {
             datas = JSON.parse(this.responseText);
             maxLength = 0;
@@ -110,6 +196,7 @@
         }
 
     </script>
+
 
 
 
