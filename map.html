@@ -144,6 +144,15 @@
                }
             }
         }
+
+        function evacReqListenr() {
+            
+            var datas = JSON.parse(this.responseText);
+            for (const data of datas) {
+                L.marker([data.lat, data.lon]).addTo(map).bindPopup(data.name);
+            }
+        }
+
         function reqListener() {
             datas = JSON.parse(this.responseText);
             maxLength = 0;
@@ -189,10 +198,15 @@
         function loadJson() {
 
         
-            var oReq = new XMLHttpRequest();
-            oReq.addEventListener("load", reqListener);
-            oReq.open("GET", "./result/result.json");
-            oReq.send();
+            var slopeReq = new XMLHttpRequest();
+            slopeReq.addEventListener("load", reqListener);
+            slopeReq.open("GET", "./result/result.json");
+            slopeReq.send();
+            var evacReq = new XMLHttpRequest();
+            evacReq.addEventListener("load", evacReqListenr);
+            evacReq.open("GET", "./result/evacdata.json");
+            evacReq.send();
+
         }
 
     </script>
